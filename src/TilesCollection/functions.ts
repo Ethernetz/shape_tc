@@ -20,6 +20,8 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
 
 export function getMatchingStateProperty(state: State, formatObj: any, propBase: string){
     switch(state){
+        case State.all:
+            return  formatObj[propBase + 'A']
         case State.selected:
             return formatObj[propBase + 'S']
         case State.hovered:
