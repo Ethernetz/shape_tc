@@ -298,7 +298,7 @@ export class Tile {
 
 
     get shapeRoundedCornerRadius(): number{
-        return 0
+        return this.formatSettings.effect.shapeRoundedCornerRadius
     }
 
     get effectSpace(): number {

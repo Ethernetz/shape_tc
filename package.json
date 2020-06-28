@@ -1,5 +1,5 @@
 {
-  "name": "visual",
+  "name": "shape_tc",
   "scripts": {
     "pbiviz": "pbiviz",
     "start": "pbiviz start",

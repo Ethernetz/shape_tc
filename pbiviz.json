@@ -1,13 +1,13 @@
 {
     "visual": {
-        "name": "button_strip",
-        "displayName": "Button Strip",
-        "guid": "rocketsE9D7B5E2197F4868970D16E2455AB0AD",
+        "name": "shape_tilecollection",
+        "displayName": "Shape Improved",
+        "guid": "rocketsE9D7B5E2197F4868960D16E2455AB0AD",
         "visualClassName": "Visual",
         "version": "1.0.0",
-        "description": "Create a heavily customizable button strip",
+        "description": "A better shape",
         "supportUrl": "https://www.google.com/",
-        "gitHubUrl": "https://github.com/Ethernetz/pbiviz_button_strip"
+        "gitHubUrl": "https://github.com/Ethernetz/shape_tc"
     },
     "apiVersion": "2.6.0",
     "author": {
@@ -15,7 +15,7 @@
         "email": "ethanjnetz@gmail.com"
     },
     "assets": {
-        "icon": "assets/baseline_double_arrow_black_18dp.png"
+        "icon": "assets/icon-20px.png"
     },
     "externalJS": [
       ],
