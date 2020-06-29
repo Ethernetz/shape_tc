@@ -7,6 +7,7 @@ import { Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, T
 import { BaseType } from 'd3'
 import { TilesCollection } from './TilesCollection'
 import { Handle } from '../interfaces'
+import * as d3 from 'd3'
 export class Tile {
     collection: TilesCollection
     i: number;
@@ -192,7 +193,6 @@ export class Tile {
         return spaceRemaining/this.rowLength
     }
     get tileHeight(): number {
-        
         if(this.formatSettings.layout.sizingMethod == TileSizingType.fixed)
             return this.formatSettings.layout.tileHeight
         return (this.containerHeight - this.totalTileVPadding) / this.numRows
@@ -307,6 +307,9 @@ export class Tile {
     get filter(): string {
         return "url(#filter" + this.i + ")"
     }
+    get bgimg(): string {
+        return "url(#image" + this.i + ")"
+    }
 
     get shadow(): boolean{
         return this.formatSettings.effect.shadow
@@ -399,7 +402,26 @@ export class Tile {
         return 1 - getMatchingStateProperty(this.currentState,this.formatSettings.icon, 'transparency') / 100
     }
 
-
+    get bgImgURL(): string {
+        if(this.tileData.bgimgURL)
+            return this.tileData.bgimgURL
+        return ""
+    }
+    
+    getBgImgDims(box: DOMRect): {width: number; height: number}{
+        let tileRatio = this.tileWidth/this.tileHeight
+        let imgRatio = box.width/box.height
+        if(tileRatio > imgRatio)
+            return {
+                width: this.tileWidth,
+                height: box.height*this.tileWidth/box.width
+            }
+        else
+            return  {
+                width: box.width*this.tileHeight/box.height,
+                height: this.tileHeight
+            }
+    }
 
 
     //Tile data
@@ -460,6 +482,8 @@ export class Tile {
             textContainer.style.width = this.textContainerWidthType
             textContainer.style.height = this.boundedTextHeight + 'px'
             textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
+            textContainer.style.paddingLeft = 0 + 'px'
+            textContainer.style.paddingRight = 0 + 'px'
         } else {
             textContainer.style.width = this.widthSpaceForText + 'px'
             textContainer.style.height = this.textContainerHeight + 'px'
@@ -511,6 +535,8 @@ export class Tile {
         if(this.iconPlacement == IconPlacement.left){
             contentContainer.style.display = 'inline-block'
             contentContainer.append(this.img, textContainer)
+            contentContainer.style.paddingLeft = this.textHmargin + 'px'
+            contentContainer.style.paddingRight = this.textHmargin + 'px'
         } else {
             contentContainer.style.height = this.contentFOHeight + 'px'
             contentContainer.style.maxHeight = this.contentFOHeight + 'px'

@@ -83,6 +83,9 @@ export class ContentSettings {
   public icon: string = ""
 }
 
+export class BgImgSettings{
+  public img: string = ""
+}
 
 export class VisualSettings extends DataViewObjectsParser {
   public tile: TileSettings = new TileSettings();
@@ -90,5 +93,6 @@ export class VisualSettings extends DataViewObjectsParser {
   public icon: IconSettings = new IconSettings();
   public layout: LayoutSettings = new LayoutSettings();
   public effects: EffectSettings = new EffectSettings();
+  public bgimg: BgImgSettings = new BgImgSettings();
   public content: ContentSettings = new ContentSettings();
 }

@@ -439,8 +439,21 @@
                     }
                 }
             }
+        },
+        
+        "bgimg": {
+            "displayName": "Background image",
+            "properties": {
+                "img": {
+                    "displayName": "Background image URL",
+                    "description": "Image URL for the first tile",
+                    "type": {
+                        "text": true
+                    }
+                }
+            }
         }
-    },
+    }, 
     "dataViewMappings": [
         {
             "categorical": {

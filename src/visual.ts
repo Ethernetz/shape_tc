@@ -212,6 +212,7 @@ export class Visual implements IVisual {
         genericsCollection.tilesData = [{
             text: this.visualSettings.content.text,
             iconURL: this.visualSettings.content.icons ? this.visualSettings.content.icon : "", 
+            bgimgURL: this.visualSettings.bgimg.img,
             contentFormatType: this.visualSettings.icon.icons ? ContentFormatType.text_icon : ContentFormatType.text,
         }];
         
