@@ -8,34 +8,32 @@ import { Tile } from "./TilesCollection/Tile";
 import powerbi from "powerbi-visuals-api";
 import { TileData } from "./TilesCollection/TileData";
 import * as d3 from "d3";
-import { Shape } from "./TilesCollection/shapes";
-import { Handle } from "./interfaces";
 import { select } from "d3";
 import { State } from "./TilesCollection/enums";
 
 // import { sizeTextContainer, styleText, makeTextTransparent } from './d3calls'
 
-export class GenericsCollection extends TilesCollection {
+export class ShapeCollection extends TilesCollection {
     visual: Visual
     options: VisualUpdateOptions
-    tilesData = <GenericData[]>this.tilesData
+    tilesData = <ShapeData[]>this.tilesData
 
     public createTile(i): Tile {
-        return new Generic(this, i, this.tilesData, this.formatSettings)
+        return new Shape(this, i, this.tilesData, this.formatSettings)
     }
 }
 
-export class Generic extends Tile {
-    collection = <GenericsCollection>this.collection
-    tilesData = <GenericData[]>this.tilesData
+export class Shape extends Tile {
+    collection = <ShapeCollection>this.collection
+    tilesData = <ShapeData[]>this.tilesData
     visual: Visual = this.collection.visual
 
     get currentState(){
-        return State.all
+        return State.unselected
     }
 }
 
-export class GenericData extends TileData {
+export class ShapeData extends TileData {
     selectionId?: ISelectionId
 }
 

@@ -1,4 +1,4 @@
-import {containerProperties, Handle} from "../interfaces"
+import {containerProperties, Handle} from "./interfaces"
 import {roundPathCorners} from "./shape-rounding"
 import { path } from "d3"
 import {round} from './functions'

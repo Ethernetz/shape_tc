@@ -10,8 +10,7 @@
         "tile": {
             "displayName": "Tile",
             "properties": {
-                
-                "colorA": {
+                "colorU": {
                     "displayName": "Background color",
                     "description": "Background color for the tiles.",
                     "type": {
@@ -22,7 +21,7 @@
                         }
                     }
                 },
-                "strokeA": {
+                "strokeU": {
                     "displayName": "Border color",
                     "description": "Border color for the tiles.",
                     "type": {
@@ -33,14 +32,14 @@
                         }
                     }
                 },
-                "strokeWidthA": {
+                "strokeWidthU": {
                     "displayName": "Stroke width",
                     "description": "The width of the stroke in pixels",
                     "type": {
                         "numeric": true
                     }
                 },
-                "transparencyA": {
+                "transparencyU": {
                     "displayName": "Transparency",
                     "description": "The transparency of the tile.",
                     "type": {
@@ -52,7 +51,7 @@
         "text": {
             "displayName": "Text Formatting",
             "properties": {
-                "colorA": {
+                "colorU": {
                     "displayName": "Font color",
                     "description": "Font color for the text.",
                     "type": {
@@ -63,7 +62,7 @@
                         }
                     }
                 },
-                "alignmentA": {
+                "alignmentU": {
                     "displayName": "Alignment",
                     "description": "Alignment position for the text",
                     "type": {
@@ -72,14 +71,14 @@
                         }
                     }
                 },
-                "fontSizeA": {
+                "fontSizeU": {
                     "displayName": "Font size",
                     "description": "The size of the font.",
                     "type": {
                         "numeric": true
                     }
                 },
-                "fontFamilyA": {
+                "fontFamilyU": {
                     "displayName": "Font family",
                     "type": {
                         "formatting": {
@@ -87,21 +86,21 @@
                         }
                     }
                 },
-                "hmarginA": {
+                "hmarginU": {
                     "displayName": "Horizontal margin",
                     "description": "Margin between text and tile left and right",
                     "type": {
                         "numeric": true
                     }
                 },
-                "bmarginA": {
+                "bmarginU": {
                     "displayName": "Bottom margin",
                     "description": "Margin between text and tile top and bottom",
                     "type": {
                         "numeric": true
                     }
                 },
-                "transparencyA": {
+                "transparencyU": {
                     "displayName": "Transparency",
                     "description": "The transparency of the font.",
                     "type": {
@@ -121,7 +120,7 @@
                     }
                 },
                 
-                "placementA": {
+                "placementU": {
                     "displayName": "Placement All",
                     "description": "How tiles will be laid out.",
                     "type": {
@@ -141,35 +140,35 @@
                         ]
                     }
                 },
-                "widthA": {
+                "widthU": {
                     "displayName": "Width",
                     "description": "Width of icon in pixels",
                     "type": {
                         "numeric": true
                     }
                 },
-                "hmarginA": {
+                "hmarginU": {
                     "displayName": "Horizontal margin",
                     "description": "Margin between icon and tile left and right",
                     "type": {
                         "numeric": true
                     }
                 },
-                "topMarginA": {
+                "topMarginU": {
                     "displayName": "Top margin",
                     "description": "Top margin for the icon",
                     "type": {
                         "numeric": true
                     }  
                 },
-                "bottomMarginA": {
+                "bottomMarginU": {
                     "displayName": "Bottom margin",
                     "description": "Bottom margin for the icon",
                     "type": {
                         "numeric": true
                     }  
                 },
-                "transparencyA": {
+                "transparencyU": {
                     "displayName": "Transparency",
                     "description": "Transparency of icon",
                     "type": {
@@ -300,7 +299,7 @@
                         "bool": true
                     }
                 },
-                "shadowColorA": {
+                "shadowColorU": {
                     "displayName": "Color",
                     "description": "Color of shadow",
                     "type": {
@@ -311,14 +310,14 @@
                         }
                     }
                 },
-                "shadowTransparencyA": {
+                "shadowTransparencyU": {
                     "displayName": "Transparency",
                     "description": "Transparency of the shadow.",
                     "type": {
                         "numeric": true
                     }
                 },
-                "shadowDirectionA": {
+                "shadowDirectionU": {
                     "displayName": "Direction",
                     "description": "Direction of the shadow",
                     "type": {
@@ -366,14 +365,14 @@
                         ]
                     }
                 },
-                "shadowDistanceA": {
+                "shadowDistanceU": {
                     "displayName": "Distance",
                     "description": "Distance of the shadow.",
                     "type": {
                         "numeric": true
                     }
                 },
-                "shadowStrengthA": {
+                "shadowStrengthU": {
                     "displayName": "Strength",
                     "description": "Strength of the shadow.",
                     "type": {
@@ -387,7 +386,7 @@
                         "bool": true
                     }
                 },
-                "glowColorA": {
+                "glowColorU": {
                     "displayName": "Color",
                     "description": "Color of glow",
                     "type": {
@@ -398,14 +397,14 @@
                         }
                     }
                 },
-                "glowTransparencyA": {
+                "glowTransparencyU": {
                     "displayName": "Transparency",
                     "description": "Transparency of the glow.",
                     "type": {
                         "numeric": true
                     }
                 },
-                "glowStrengthA": {
+                "glowStrengthU": {
                     "displayName": "Strength",
                     "description": "Strength of the glow.",
                     "type": {
@@ -453,7 +452,8 @@
                 }
             }
         }
-    }, 
+    },
+    "suppressDefaultTitle": true, 
     "dataViewMappings": [
         {
             "categorical": {

@@ -62,7 +62,7 @@ import {ContentSource} from './enums'
 import { select, merge } from "d3";
 
 
-import {GenericsCollection} from './GenericsCollection'
+import {ShapeCollection} from './ShapeCollection'
 import { ContentFormatType } from "./TilesCollection/enums";
 
 export class Visual implements IVisual {
@@ -98,28 +98,9 @@ export class Visual implements IVisual {
             let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(Object.keys(settings[settingKey]))
             for (let j = 0; j < groupedKeyNamesArr.length; j++) {
                 let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
-                switch (settings[settingKey].state) {
-                    case State.all:
-                        delete settings[settingKey][groupedKeyNames.selected]
-                        delete settings[settingKey][groupedKeyNames.unselected]
-                        delete settings[settingKey][groupedKeyNames.hover]
-                        break
-                    case State.selected:
-                        delete settings[settingKey][groupedKeyNames.all]
-                        delete settings[settingKey][groupedKeyNames.unselected]
-                        delete settings[settingKey][groupedKeyNames.hover]
-                        break
-                    case State.unselected:
-                        delete settings[settingKey][groupedKeyNames.all]
-                        delete settings[settingKey][groupedKeyNames.selected]
-                        delete settings[settingKey][groupedKeyNames.hover]
-                        break
-                    case State.hovered:
-                        delete settings[settingKey][groupedKeyNames.all]
-                        delete settings[settingKey][groupedKeyNames.selected]
-                        delete settings[settingKey][groupedKeyNames.unselected]
-                        break
-                }
+                delete settings[settingKey][groupedKeyNames.all]
+                delete settings[settingKey][groupedKeyNames.selected]
+                delete settings[settingKey][groupedKeyNames.hover]
             }
         }
         let iconSettingsKeys: string[] = Object.keys(settings.icon)
@@ -137,10 +118,8 @@ export class Visual implements IVisual {
                 if (effectSettingsKeys[i].startsWith("glow") && effectSettingsKeys[i] != "glow")
                     delete settings.effects[effectSettingsKeys[i]]
 
-        if (!this.visualSettings.content.icons){
-            console.log("hey")
+        if (!this.visualSettings.content.icons)
             delete settings.content['icon']
-        }
 
 
         let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.icon.state, 'placement')] as IconPlacement
@@ -148,17 +127,9 @@ export class Visual implements IVisual {
             delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "topMargin")]
             delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "bottomMargin")]
         }
-        if(!(settings.content.source != ContentSource.measures && settings.icon.icons && iconPlacement == IconPlacement.above))
+        if(!(settings.icon.icons && iconPlacement == IconPlacement.above))
             delete settings.text[getCorrectPropertyStateName(settings.text.state, "bmargin")]
 
-        if (settings.layout.sizingMethod != TileSizingType.fixed) {
-            delete settings.layout.tileWidth;
-            delete settings.layout.tileHeight;
-            delete settings.layout.tileAlignment;
-        }
-        if (settings.layout.tileLayout != TileLayoutType.grid) {
-            delete settings.layout.rowLength
-        }
 
         if (settings.layout.tileShape != TileShape.parallelogram) {
             delete settings.layout.parallelogramAngle
@@ -192,24 +163,24 @@ export class Visual implements IVisual {
             .style('height', options.viewport.height)
 
 
-        let genericsCollection = new GenericsCollection()
+        let shapeCollection = new ShapeCollection()
 
-        genericsCollection.formatSettings.tile = this.visualSettings.tile
-        genericsCollection.formatSettings.text = this.visualSettings.text
-        genericsCollection.formatSettings.icon = this.visualSettings.icon
-        genericsCollection.formatSettings.layout = this.visualSettings.layout
-        genericsCollection.formatSettings.effect = this.visualSettings.effects
+        shapeCollection.formatSettings.tile = this.visualSettings.tile
+        shapeCollection.formatSettings.text = this.visualSettings.text
+        shapeCollection.formatSettings.icon = this.visualSettings.icon
+        shapeCollection.formatSettings.layout = this.visualSettings.layout
+        shapeCollection.formatSettings.effect = this.visualSettings.effects
 
 
-        genericsCollection.container = this.container
-        genericsCollection.viewport = {
+        shapeCollection.container = this.container
+        shapeCollection.viewport = {
             height: options.viewport.height,
             width:options.viewport.width,
         }
-        genericsCollection.visual = this
-        genericsCollection.options = options
+        shapeCollection.visual = this
+        shapeCollection.options = options
 
-        genericsCollection.tilesData = [{
+        shapeCollection.tilesData = [{
             text: this.visualSettings.content.text,
             iconURL: this.visualSettings.content.icons ? this.visualSettings.content.icon : "", 
             bgimgURL: this.visualSettings.bgimg.img,
@@ -218,7 +189,7 @@ export class Visual implements IVisual {
         
         
         console.log("rendering..")
-        genericsCollection.render()
+        shapeCollection.render()
         }
     
 

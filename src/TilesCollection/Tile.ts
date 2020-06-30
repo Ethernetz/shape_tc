@@ -6,7 +6,7 @@ import {getMatchingStateProperty, calculateWordDimensions} from './functions'
 import { Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical, ParallelogramVertical } from "./shapes"
 import { BaseType } from 'd3'
 import { TilesCollection } from './TilesCollection'
-import { Handle } from '../interfaces'
+import { Handle } from './interfaces'
 import * as d3 from 'd3'
 export class Tile {
     collection: TilesCollection
@@ -399,7 +399,7 @@ export class Tile {
         return Math.max(this.formatSettings.effect.glowStrengthS, this.formatSettings.effect.glowStrengthU, this.formatSettings.effect.glowStrengthH)
     }
     get glowSpace(): number {
-        return this.formatSettings.effect.glow ? 3 * (this.glowMaxStrength) : 0
+        return this.formatSettings.effect.glow ? 5 * (this.glowMaxStrength) : 0
     }
 
 

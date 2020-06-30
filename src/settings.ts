@@ -29,55 +29,27 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 import * as TileCollectionFormatSettings from "./TilesCollection/FormatSettings"
-import { AlignmentType, TileSizingType, TileLayoutType, TileShape, Direction, IconPlacement, State } from './TilesCollection/enums'
-import { ContentSource } from './enums'
+import { State } from "./TilesCollection/enums";
 
 export class TileSettings extends TileCollectionFormatSettings.TileSettings {
-  public colorA: string = "#262222";
-  public strokeA: string = "#000";
-  public strokeWidthA: number = 0;
-  public transparencyA: number = 0;
+  state: State = State.unselected
 }
 
 export class TextSettings extends TileCollectionFormatSettings.TextSettings {
-  public colorA: string = "#fff";
-  public alignmentA: AlignmentType = AlignmentType.center;
-  public fontSizeA: number = 14;
-  public fontFamilyA: string = "wf_standard-font, helvetica, arial, sans-serif";
-  public hmarginA: number = 0;
-  public bmarginA: number = 0;
-  public transparencyA: number = 0;
+  state: State = State.unselected
 }
 
 export class IconSettings extends TileCollectionFormatSettings.IconSettings {
-  public placementA: IconPlacement = IconPlacement.left;
-  public widthA: number = 40;
-  public hmarginA: number = 10;
-  public topMarginA: number = 10;
-  public bottomMarginA: number = 10;
-  public transparencyA: number = 0;
+  state: State = State.unselected
 }
 
-export class LayoutSettings extends TileCollectionFormatSettings.LayoutSettings {
-}
+export class LayoutSettings extends TileCollectionFormatSettings.LayoutSettings {}
 
 export class EffectSettings extends TileCollectionFormatSettings.EffectSettings {
-
-  public shadowColorA: string = "#000"
-  public shadowTransparencyA: number = 70
-  public shadowDirectionA: Direction = Direction.bottom_right
-  public shadowDistanceA: number = 2
-  public shadowStrengthA: number = 4
-  public glowColorA: string = "#3380FF"
-  public glowTransparencyA: number = 0
-  public glowStrengthA: number = 2
+  state: State = State.unselected
 }
 
 export class ContentSettings {
-  public multiselect: boolean = false
-  public source: ContentSource = ContentSource.fixed
-
-  public n: number = 1
   public icons: boolean = false
   public text: string = "Shape Text"
   public icon: string = ""
