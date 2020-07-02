@@ -32,8 +32,6 @@ import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructor
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
-import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import ISelectionIdBuilder = powerbi.extensibility.ISelectionIdBuilder;
 import DataView = powerbi.DataView;
 import VisualObjectInstancesToPersist = powerbi.VisualObjectInstancesToPersist
 import VisualObjectInstance = powerbi.VisualObjectInstance
@@ -51,8 +49,6 @@ import * as d3 from "d3";
 
 import { propertyStateName} from './interfaces'
 import { getPropertyStateNameArr, getObjectsToPersist, getCorrectPropertyStateName } from './functions'
-import { SelectionManagerUnbound } from './SelectionManagerUnbound'
-
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 // import * as enums from "./enums"
@@ -67,8 +63,6 @@ import { ContentFormatType } from "./TilesCollection/enums";
 
 export class Visual implements IVisual {
     private target: HTMLElement;
-    public selectionManager: ISelectionManager;
-    public selectionManagerUnbound: SelectionManagerUnbound
     public host: IVisualHost;
 
     private visualSettings: VisualSettings;
@@ -188,7 +182,6 @@ export class Visual implements IVisual {
         }];
         
         
-        console.log("rendering..")
         shapeCollection.render()
         }
     
