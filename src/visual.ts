@@ -48,7 +48,8 @@ import * as d3 from "d3";
 // import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { propertyStateName} from './interfaces'
-import { getPropertyStateNameArr, getObjectsToPersist, getCorrectPropertyStateName } from './functions'
+import { getCorrectPropertyStateName } from './functions'
+import { getPropertyStateNameArr } from './TilesCollectionUtlities/functions'
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 // import * as enums from "./enums"
@@ -148,10 +149,14 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
+       
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-
+        // let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
+        console.log(this.visualSettings)
+        // if (objects.merge.length != 0)
+        //     this.host.persistProperties(objects);
         this.svg
             .style('width', options.viewport.width)
             .style('height', options.viewport.height)
@@ -171,8 +176,6 @@ export class Visual implements IVisual {
             height: options.viewport.height,
             width:options.viewport.width,
         }
-        shapeCollection.visual = this
-        shapeCollection.options = options
 
         shapeCollection.tilesData = [{
             text: this.visualSettings.content.text,
