@@ -36,7 +36,7 @@ export class TileSettings extends TileCollectionFormatSettings.TileSettings {
   state: State = State.unselected
   statesUsed: StatesUsed = {
     selected: false,
-    unselected: false,
+    unselected: true,
     hover: false,
     disabled: false
   }
@@ -46,7 +46,7 @@ export class TextSettings extends TileCollectionFormatSettings.TextSettings {
   state: State = State.unselected
   statesUsed: StatesUsed = {
     selected: false,
-    unselected: false,
+    unselected: true,
     hover: false,
     disabled: false
   }
@@ -56,7 +56,7 @@ export class IconSettings extends TileCollectionFormatSettings.IconSettings {
   state: State = State.unselected
   statesUsed: StatesUsed = {
     selected: false,
-    unselected: false,
+    unselected: true,
     hover: false,
     disabled: false
   }
@@ -68,7 +68,7 @@ export class EffectSettings extends TileCollectionFormatSettings.EffectSettings 
   state: State = State.unselected
   statesUsed: StatesUsed = {
     selected: false,
-    unselected: false,
+    unselected: true,
     hover: false,
     disabled: false
   }

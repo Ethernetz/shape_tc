@@ -86,8 +86,15 @@
                         }
                     }
                 },
-                "hmarginU": {
-                    "displayName": "Horizontal margin",
+                "marginLeftU": {
+                    "displayName": "Left margin",
+                    "description": "Margin between text and tile left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "marginRightU": {
+                    "displayName": "Right margin",
                     "description": "Margin between text and tile left and right",
                     "type": {
                         "numeric": true
@@ -262,20 +269,6 @@
                 "tab_cutCornerLength": {
                     "displayName": "Length",
                     "description": "How much to cut out of the tab",
-                    "type": {
-                        "numeric": true
-                    }
-                },
-                "tileWidth": {
-                    "displayName": "Tile width",
-                    "description": "The width of each tile.",
-                    "type": {
-                        "numeric": true
-                    }
-                },
-                "tileHeight": {
-                    "displayName": "Tile height",
-                    "description": "The height of each tile.",
                     "type": {
                         "numeric": true
                     }
