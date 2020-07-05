@@ -30,49 +30,48 @@ import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 import * as TileCollectionFormatSettings from "./TilesCollection/FormatSettings"
 import { State, IconPlacement, Direction, AlignmentType } from "./TilesCollection/enums";
+import { StatesUsed } from "./TilesCollection/interfaces";
 
 export class TileSettings extends TileCollectionFormatSettings.TileSettings {
   state: State = State.unselected
-  public colorU: string = "#262222" 
-  public strokeU: string = "#000";
-  public strokeWidthU: number = 0;
-  public transparencyU: number = 0;
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: false,
+    hover: false,
+    disabled: false
+  }
 }
 
 export class TextSettings extends TileCollectionFormatSettings.TextSettings {
   state: State = State.unselected
-  public colorU: string = "#fff";
-  public alignmentU: AlignmentType = AlignmentType.center;
-  public fontSizeU: number = 14;
-  public fontFamilyU: string = "wf_standard-font, helvetica, arial, sans-serif";
-  public hmarginU: number = 0;  
-  public bmarginU: number = 0;
-  public transparencyU: number = 0;
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: false,
+    hover: false,
+    disabled: false
+  }
 }
 
 export class IconSettings extends TileCollectionFormatSettings.IconSettings {
   state: State = State.unselected
-  public placementU: IconPlacement = IconPlacement.left;
-  public widthU: number = 40;
-  public hmarginU: number = 10;
-  public topMarginU: number = 10;
-  public bottomMarginU: number = 10;
-  public transparencyU: number = 0;
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: false,
+    hover: false,
+    disabled: false
+  }
 }
 
 export class LayoutSettings extends TileCollectionFormatSettings.LayoutSettings {}
 
 export class EffectSettings extends TileCollectionFormatSettings.EffectSettings {
   state: State = State.unselected
-  public shadowColorU: string = "#000"
-  public shadowTransparencyU: number = 70
-  public shadowDirectionU: Direction = Direction.bottom_right
-  public shadowDistanceU: number = 2
-  public shadowStrengthU: number = 4
-  
-  public glowColorU: string = "#41A4FF"
-  public glowTransparencyU: number = 0
-  public glowStrengthU: number = 2
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: false,
+    hover: false,
+    disabled: false
+  }
 }
 
 export class ContentSettings {

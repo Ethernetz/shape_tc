@@ -48,8 +48,8 @@ import * as d3 from "d3";
 // import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { PropertyGroupKeys } from './TilesCollection/interfaces'
-import { getCorrectPropertyStateName } from './TilesCollectionUtlities/functions'
-import { getPropertyStateNameArr } from './TilesCollectionUtlities/functions'
+import { getCorrectPropertyStateName } from './TilesCollection/functions'
+import { getPropertyStateNameArr, getObjectsToPersist } from './TilesCollectionUtlities/functions'
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 // import * as enums from "./enums"
@@ -153,14 +153,9 @@ export class Visual implements IVisual {
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-        // let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
-        console.log(this.visualSettings)
-        // if (objects.merge.length != 0)
-        //     this.host.persistProperties(objects);
-        this.svg
-            .style('width', options.viewport.width)
-            .style('height', options.viewport.height)
-
+        let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
+        if (objects.merge.length != 0)
+            this.host.persistProperties(objects);
 
         let shapeCollection = new ShapeCollection()
 
@@ -172,6 +167,7 @@ export class Visual implements IVisual {
 
 
         shapeCollection.container = this.container
+        shapeCollection.svg = this.svg
         shapeCollection.viewport = {
             height: options.viewport.height,
             width:options.viewport.width,
