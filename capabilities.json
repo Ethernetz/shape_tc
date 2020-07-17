@@ -275,7 +275,7 @@
                 }
             }
         },
-        "effects": {
+        "effect": {
             "displayName": "Effects",
             "properties": {
                 "shapeRoundedCornerRadius": {
@@ -436,6 +436,13 @@
         "bgimg": {
             "displayName": "Background image",
             "properties": {
+                "bgimgs": {
+                    "displayName": "Background images",
+                    "description": "Option to give URL for tile icons",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "img": {
                     "displayName": "Background image URL",
                     "description": "Image URL for the first tile",

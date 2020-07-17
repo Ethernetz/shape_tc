@@ -34,6 +34,7 @@ import IVisual = powerbi.extensibility.visual.IVisual;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import DataView = powerbi.DataView;
 import VisualObjectInstancesToPersist = powerbi.VisualObjectInstancesToPersist
+import DataViewPropertyValue = powerbi.DataViewPropertyValue
 import VisualObjectInstance = powerbi.VisualObjectInstance
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject
 
@@ -59,7 +60,7 @@ import {ContentSource} from './enums'
 import { select, merge } from "d3";
 
 
-import {ShapeCollection} from './ShapeCollection'
+import {ShapeCollection, ShapeData} from './ShapeCollection'
 import { ContentFormatType } from "./TilesCollection/enums";
 
 export class Visual implements IVisual {
@@ -70,82 +71,149 @@ export class Visual implements IVisual {
 
     private svg: Selection<SVGElement>;
     private container: Selection<SVGElement>;
-    public hoveredIndex: number
 
     public shiftFired: boolean = false
 
+    public visualElement: HTMLElement;
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
+        this.visualElement = options.element
+
         this.svg = d3.select(options.element)
             .append('svg')
-            .classed('navigator', true);
+            .classed('shape', true);
 
         this.container = this.svg.append("g")
             .classed('container', true);
     }
 
-    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
-        const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
-        let settingsKeys = Object.keys(settings)
-        for (let i = 0; i < settingsKeys.length; i++) {
-            let settingKey: string = settingsKeys[i]
-            let groupedKeyNamesArr: PropertyGroupKeys[] = getPropertyStateNameArr(Object.keys(settings[settingKey]))
-            for (let j = 0; j < groupedKeyNamesArr.length; j++) {
-                let groupedKeyNames: PropertyGroupKeys = groupedKeyNamesArr[j]
-                delete settings[settingKey][groupedKeyNames.all]
-                delete settings[settingKey][groupedKeyNames.selected]
-                delete settings[settingKey][groupedKeyNames.hover]
+    public getEnumeratedStateProperties(propertyGroup: any, prefix?: string): { [propertyName: string]: DataViewPropertyValue } {
+        let properties: { [propertyName: string]: DataViewPropertyValue } = {}
+        let groupedKeyNamesArr: PropertyGroupKeys[] = getPropertyStateNameArr(Object.keys(propertyGroup))
+        if (groupedKeyNamesArr.length > 0 && propertyGroup["state"]) {
+            let state: State = propertyGroup["state"]
+            for (let i = 0; i < groupedKeyNamesArr.length; i++) {
+                let groupedKeyNames = groupedKeyNamesArr[i]
+                if (prefix && !groupedKeyNames.default.startsWith(prefix))
+                    continue
+                switch (state) {
+                    case State.all:
+                        properties[groupedKeyNames.all] = propertyGroup[groupedKeyNames.all]
+                        break
+                    case State.selected:
+                        properties[groupedKeyNames.selected] = propertyGroup[groupedKeyNames.selected]
+                        break
+                    case State.unselected:
+                        properties[groupedKeyNames.unselected] = propertyGroup[groupedKeyNames.unselected]
+                        break
+                    case State.hovered:
+                        properties[groupedKeyNames.hover] = propertyGroup[groupedKeyNames.hover]
+                        break
+                    case State.disabled:
+                        properties[groupedKeyNames.disabled] = propertyGroup[groupedKeyNames.disabled]
+                        break
+                }
             }
         }
-        let iconSettingsKeys: string[] = Object.keys(settings.icon)
-        if (!settings.icon.icons)
-            for (let i = 0; i < iconSettingsKeys.length; i++)
-                if (iconSettingsKeys[i] != 'icons')
-                    delete settings.icon[iconSettingsKeys[i]]
-        let effectSettingsKeys: string[] = Object.keys(settings.effects)
-        if (!settings.effects.shadow)
-            for (let i = 0; i < effectSettingsKeys.length; i++)
-                if (effectSettingsKeys[i].startsWith("shadow") && effectSettingsKeys[i] != "shadow")
-                    delete settings.effects[effectSettingsKeys[i]]
-        if (!settings.effects.glow)
-            for (let i = 0; i < effectSettingsKeys.length; i++)
-                if (effectSettingsKeys[i].startsWith("glow") && effectSettingsKeys[i] != "glow")
-                    delete settings.effects[effectSettingsKeys[i]]
 
-        if (!this.visualSettings.content.icons)
-            delete settings.content['icon']
+        return properties
+    }
+
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
+        let objectName = options.objectName;
+        let objectEnumeration: VisualObjectInstance[] = [];
+
+        let properties: { [propertyName: string]: DataViewPropertyValue } = {}
 
 
-        let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.icon.state, 'placement')] as IconPlacement
-        if (iconPlacement == IconPlacement.left) {
-            delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "topMargin")]
-            delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "bottomMargin")]
-        }
-        if(!(settings.icon.icons && iconPlacement == IconPlacement.above))
-            delete settings.text[getCorrectPropertyStateName(settings.text.state, "bmargin")]
+        const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
+        switch (objectName) {
+            case "tile":
+                properties.state = settings.tile.state
+                properties.hoverStyling = settings.tile.hoverStyling
+                properties = {...properties, ...this.getEnumeratedStateProperties(settings.tile) }
+                break
+            case "text": {
+                properties.state = settings.text.state
+                properties.hoverStyling = settings.text.hoverStyling
+                let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.text.state, 'placement')] as IconPlacement
+                let filtered = Object.keys(settings.text)
+                    .filter(key => !(settings.icon.icons && iconPlacement != IconPlacement.above && key == "bmarginA"))
+                    .reduce((obj, key) => {
+                        obj[key] = settings.text[key]
+                        return obj;
+                    }, {})
+
+                properties = {...properties, ...this.getEnumeratedStateProperties(filtered) }
+                break
+            }
+            case "icon":{
+                properties.icons = settings.icon.icons
+                let excludeWhenLeft = ["topMarginA", "bottomMarginA"]
+
+                if (settings.icon.icons) {
+                    let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.icon.state, 'placement')] as IconPlacement
+                    properties.state = settings.icon.state
+                    properties.hoverStyling = settings.icon.hoverStyling
+                    let filtered = Object.keys(settings.icon)
+                        .filter(key => !(iconPlacement && excludeWhenLeft.indexOf(key) > -1))
+                        .reduce((obj, key) => {
+                            obj[key] = settings.icon[key]
+                            return obj;
+                        }, {})
 
 
-        if (settings.layout.tileShape != TileShape.parallelogram) {
-            delete settings.layout.parallelogramAngle
-        }
-        if (settings.layout.tileShape != TileShape.chevron) {
-            delete settings.layout.chevronAngle
-        }
-        if (settings.layout.tileShape != TileShape.pentagon) {
-            delete settings.layout.pentagonAngle
-        }
-        if (settings.layout.tileShape != TileShape.hexagon) {
-            delete settings.layout.hexagonAngle
-        }
-        if (settings.layout.tileShape != TileShape.tab_cutCorners) {
-            delete settings.layout.tab_cutCornersLength
-        }
-        if (settings.layout.tileShape != TileShape.tab_cutCorner) {
-            delete settings.layout.tab_cutCornerLength
+                    properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
+                }
+                break}
+            case "layout": {
+                let excludeWhenNotFixed = ["tileWidth", "tileHeight", "tileAlignment"]
+
+                let filtered = Object.keys(settings.layout)
+                    .filter(key => !(key.endsWith("Angle") || key.endsWith("Length"))
+                        || key == settings.layout.tileShape + "Angle"
+                        || key == settings.layout.tileShape + "Length")
+                    .filter(key => !(settings.layout.sizingMethod != TileSizingType.fixed && excludeWhenNotFixed.indexOf(key) > -1))
+                    .reduce((obj, key) => {
+                        obj[key] = settings.layout[key]
+                        return obj;
+                    }, {})
+
+                properties = { ...properties, ...filtered }
+                break
+            }
+            case "effect":
+                properties.shapeRoundedCornerRadius = settings.effect.shapeRoundedCornerRadius
+                properties.state = settings.effect.state
+                properties.hoverStyling = settings.effect.hoverStyling
+                properties.shadow = settings.effect.shadow
+                if (settings.effect.shadow)
+                    properties = { ...properties, ...this.getEnumeratedStateProperties(settings.effect, "shadow") }
+                properties.glow = settings.effect.glow
+                if (settings.effect.glow)
+                    properties = { ...properties, ...this.getEnumeratedStateProperties(settings.effect, "glow") }
+                break
+            case "content":
+                properties.icons = settings.content.icons
+                properties.text = settings.content.text
+                if(settings.content.icons)
+                    properties.icon = settings.content.icon
+                break
+            case "bgimg":
+                properties.bgimgs = settings.bgimg.bgimgs
+                if (settings.bgimg.bgimgs)
+                    properties = { ...properties, ...this.getEnumeratedStateProperties(settings.bgimg) }
+                break
         }
 
-        return VisualSettings.enumerateObjectInstances(settings, options);
+        objectEnumeration.push({
+            objectName: objectName,
+            properties: properties,
+            selector: null
+        })
+
+        return objectEnumeration
     }
 
     public update(options: VisualUpdateOptions) {
@@ -163,25 +231,29 @@ export class Visual implements IVisual {
         shapeCollection.formatSettings.text = this.visualSettings.text
         shapeCollection.formatSettings.icon = this.visualSettings.icon
         shapeCollection.formatSettings.layout = this.visualSettings.layout
-        shapeCollection.formatSettings.effect = this.visualSettings.effects
+        shapeCollection.formatSettings.effect = this.visualSettings.effect
 
 
-        shapeCollection.container = this.container
         shapeCollection.svg = this.svg
+        shapeCollection.container = this.container
         shapeCollection.viewport = {
             height: options.viewport.height,
-            width:options.viewport.width,
+            width: options.viewport.width,
+        }
+        shapeCollection.visualElement = this.visualElement
+        
+        
+        shapeCollection.render(this.createShapeData())
         }
 
-        shapeCollection.tilesData = [{
-            text: this.visualSettings.content.text,
-            iconURL: this.visualSettings.content.icons ? this.visualSettings.content.icon : "", 
-            bgimgURL: this.visualSettings.bgimg.img,
-            contentFormatType: this.visualSettings.icon.icons ? ContentFormatType.text_icon : ContentFormatType.text,
-        }];
-        
-        
-        shapeCollection.render()
+        public createShapeData(): ShapeData[] {
+            let shapeData: ShapeData[] =  [{
+                text: this.visualSettings.content.text,
+                iconURL: this.visualSettings.content.icons ? this.visualSettings.content.icon : "", 
+                bgimgURL: this.visualSettings.bgimg.img,
+                contentFormatType: this.visualSettings.icon.icons ? ContentFormatType.text_icon : ContentFormatType.text,
+            }];
+            return shapeData
         }
     
 
