@@ -37,7 +37,7 @@ import VisualObjectInstancesToPersist = powerbi.VisualObjectInstancesToPersist
 import DataViewPropertyValue = powerbi.DataViewPropertyValue
 import VisualObjectInstance = powerbi.VisualObjectInstance
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject
-
+import VisualUpdateType = powerbi.VisualUpdateType
 
 import { VisualSettings } from "./settings";
 import VisualObjectInstanceEnumeration = powerbi.VisualObjectInstanceEnumeration;
@@ -76,16 +76,23 @@ export class Visual implements IVisual {
 
     public visualElement: HTMLElement;
 
+    public shapeCollection: ShapeCollection
+
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
         this.visualElement = options.element
 
         this.svg = d3.select(options.element)
             .append('svg')
-            .classed('shape', true);
+            .classed('buttonstrip', true);
 
         this.container = this.svg.append("g")
             .classed('container', true);
+
+        this.shapeCollection = new ShapeCollection()
+        this.shapeCollection.svg = this.svg
+        this.shapeCollection.container = this.container
+        this.shapeCollection.visualElement = options.element
     }
 
     public getEnumeratedStateProperties(propertyGroup: any, prefix?: string): { [propertyName: string]: DataViewPropertyValue } {
@@ -130,43 +137,31 @@ export class Visual implements IVisual {
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
         switch (objectName) {
             case "tile":
-                properties.state = settings.tile.state
-                properties.hoverStyling = settings.tile.hoverStyling
                 properties = {...properties, ...this.getEnumeratedStateProperties(settings.tile) }
                 break
             case "text": {
-                properties.state = settings.text.state
-                properties.hoverStyling = settings.text.hoverStyling
-                let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.text.state, 'placement')] as IconPlacement
+                properties.show = settings.text.show
                 let filtered = Object.keys(settings.text)
-                    .filter(key => !(settings.icon.icons && iconPlacement != IconPlacement.above && key == "bmarginA"))
                     .reduce((obj, key) => {
                         obj[key] = settings.text[key]
                         return obj;
                     }, {})
 
-                properties = {...properties, ...this.getEnumeratedStateProperties(filtered) }
+                properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
                 break
             }
             case "icon":{
-                properties.icons = settings.icon.icons
-                let excludeWhenLeft = ["topMarginA", "bottomMarginA"]
-
-                if (settings.icon.icons) {
-                    let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.icon.state, 'placement')] as IconPlacement
-                    properties.state = settings.icon.state
-                    properties.hoverStyling = settings.icon.hoverStyling
-                    let filtered = Object.keys(settings.icon)
-                        .filter(key => !(iconPlacement && excludeWhenLeft.indexOf(key) > -1))
-                        .reduce((obj, key) => {
-                            obj[key] = settings.icon[key]
-                            return obj;
-                        }, {})
+                properties.show = settings.icon.show
+                let filtered = Object.keys(settings.icon)
+                    .reduce((obj, key) => {
+                        obj[key] = settings.icon[key]
+                        return obj;
+                    }, {})
 
 
-                    properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
-                }
-                break}
+                properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
+                break
+            }
             case "layout": {
                 let excludeWhenNotFixed = ["tileWidth", "tileHeight", "tileAlignment"]
 
@@ -181,6 +176,15 @@ export class Visual implements IVisual {
                     }, {})
 
                 properties = { ...properties, ...filtered }
+                break
+            }
+            case "contentAlignment": {
+                let filtered = Object.keys(settings.contentAlignment)
+                    .reduce((obj, key) => {
+                        obj[key] = settings.contentAlignment[key]
+                        return obj;
+                    }, {})
+                properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
                 break
             }
             case "effect":
@@ -225,33 +229,40 @@ export class Visual implements IVisual {
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
 
-        let shapeCollection = new ShapeCollection()
 
-        shapeCollection.formatSettings.tile = this.visualSettings.tile
-        shapeCollection.formatSettings.text = this.visualSettings.text
-        shapeCollection.formatSettings.icon = this.visualSettings.icon
-        shapeCollection.formatSettings.layout = this.visualSettings.layout
-        shapeCollection.formatSettings.effect = this.visualSettings.effect
+        this.shapeCollection.formatSettings.tile = this.visualSettings.tile
+        this.shapeCollection.formatSettings.text = this.visualSettings.text
+        this.shapeCollection.formatSettings.icon = this.visualSettings.icon
+        this.shapeCollection.formatSettings.layout = this.visualSettings.layout
+        this.shapeCollection.formatSettings.contentAlignment = this.visualSettings.contentAlignment
+        this.shapeCollection.formatSettings.effect = this.visualSettings.effect
 
-
-        shapeCollection.svg = this.svg
-        shapeCollection.container = this.container
-        shapeCollection.viewport = {
+        this.shapeCollection.viewport = {
             height: options.viewport.height,
             width: options.viewport.width,
         }
-        shapeCollection.visualElement = this.visualElement
         
-        
-        shapeCollection.render(this.createShapeData())
+            if (options.type == VisualUpdateType.Resize || options.type == VisualUpdateType.ResizeEnd) {
+                this.shapeCollection.onResize()
+            } else {
+                // if (objects.merge.length == 0) //TODO allow this
+                    this.shapeCollection.onDataChange(this.createShapeData())
+            }
         }
 
         public createShapeData(): ShapeData[] {
+            let contentFormatType = ContentFormatType.empty
+            if (this.visualSettings.text.show && !this.visualSettings.icon.show)
+                contentFormatType = ContentFormatType.text
+            if (!this.visualSettings.text.show && this.visualSettings.icon.show)
+                contentFormatType = ContentFormatType.icon
+            if (this.visualSettings.text.show && this.visualSettings.icon.show)
+                contentFormatType = ContentFormatType.text_icon
             let shapeData: ShapeData[] =  [{
                 text: this.visualSettings.content.text,
                 iconURL: this.visualSettings.content.icons ? this.visualSettings.content.icon : "", 
                 bgimgURL: this.visualSettings.bgimg.img,
-                contentFormatType: this.visualSettings.icon.icons ? ContentFormatType.text_icon : ContentFormatType.text,
+                contentFormatType: contentFormatType,
             }];
             return shapeData
         }

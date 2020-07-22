@@ -29,7 +29,7 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 import * as TileCollectionFormatSettings from "./TilesCollection/FormatSettings"
-import { State, IconPlacement, Direction, AlignmentType } from "./TilesCollection/enums";
+import { State} from "./TilesCollection/enums";
 import { StatesUsed } from "./TilesCollection/interfaces";
 
 export class TileSettings extends TileCollectionFormatSettings.TileSettings {
@@ -62,7 +62,25 @@ export class IconSettings extends TileCollectionFormatSettings.IconSettings {
   }
 }
 
-export class LayoutSettings extends TileCollectionFormatSettings.LayoutSettings {}
+export class LayoutSettings extends TileCollectionFormatSettings.LayoutSettings {
+  state: State = State.unselected
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: true,
+    hover: false,
+    disabled: false
+  }
+}
+
+export class ContentAlignmentSettings extends TileCollectionFormatSettings.ContentAlignmentSettings{
+  state: State = State.unselected
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: true,
+    hover: false,
+    disabled: false
+  }
+}
 
 export class EffectSettings extends TileCollectionFormatSettings.EffectSettings {
   state: State = State.unselected
@@ -90,6 +108,7 @@ export class VisualSettings extends DataViewObjectsParser {
   public text: TextSettings = new TextSettings();
   public icon: IconSettings = new IconSettings();
   public layout: LayoutSettings = new LayoutSettings();
+  public contentAlignment: ContentAlignmentSettings = new ContentAlignmentSettings();
   public effect: EffectSettings = new EffectSettings();
   public bgimg: BgImgSettings = new BgImgSettings();
   public content: ContentSettings = new ContentSettings();
