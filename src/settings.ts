@@ -93,13 +93,12 @@ export class EffectSettings extends TileCollectionFormatSettings.EffectSettings 
 }
 
 export class ContentSettings {
-  public icons: boolean = false
   public text: string = "Shape Text"
   public icon: string = ""
 }
 
 export class BgImgSettings{
-  public bgimgs: boolean = false
+  public show: boolean = false
   public img: string = ""
 }
 

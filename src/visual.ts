@@ -199,15 +199,12 @@ export class Visual implements IVisual {
                     properties = { ...properties, ...this.getEnumeratedStateProperties(settings.effect, "glow") }
                 break
             case "content":
-                properties.icons = settings.content.icons
                 properties.text = settings.content.text
-                if(settings.content.icons)
-                    properties.icon = settings.content.icon
+                properties.icon = settings.content.icon
                 break
             case "bgimg":
-                properties.bgimgs = settings.bgimg.bgimgs
-                if (settings.bgimg.bgimgs)
-                    properties = { ...properties, ...this.getEnumeratedStateProperties(settings.bgimg) }
+                properties.show = settings.bgimg.show
+                properties.img = settings.bgimg.img
                 break
         }
 
@@ -260,8 +257,8 @@ export class Visual implements IVisual {
                 contentFormatType = ContentFormatType.text_icon
             let shapeData: ShapeData[] =  [{
                 text: this.visualSettings.content.text,
-                iconURL: this.visualSettings.content.icons ? this.visualSettings.content.icon : "", 
-                bgimgURL: this.visualSettings.bgimg.img,
+                iconURL: this.visualSettings.content.icon ||  "", 
+                bgimgURL: this.visualSettings.bgimg.show ? this.visualSettings.bgimg.img : "",
                 contentFormatType: contentFormatType,
             }];
             return shapeData
