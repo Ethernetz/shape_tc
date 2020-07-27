@@ -32,7 +32,19 @@ import * as TileCollectionFormatSettings from "./TilesCollection/FormatSettings"
 import { State} from "./TilesCollection/enums";
 import { StatesUsed } from "./TilesCollection/interfaces";
 
-export class TileSettings extends TileCollectionFormatSettings.TileSettings {
+export class TileFillSettings extends TileCollectionFormatSettings.TileFillSettings {
+  state: State = State.unselected
+  statesUsed: StatesUsed = {
+    selected: false,
+    unselected: true,
+    hover: false,
+    disabled: false
+  }
+  public showBgimg: boolean = false
+  public img: string = ""
+}
+
+export class TileStrokeSettings extends TileCollectionFormatSettings.TileStrokeSettings{
   state: State = State.unselected
   statesUsed: StatesUsed = {
     selected: false,
@@ -41,6 +53,7 @@ export class TileSettings extends TileCollectionFormatSettings.TileSettings {
     disabled: false
   }
 }
+
 
 export class TextSettings extends TileCollectionFormatSettings.TextSettings {
   state: State = State.unselected
@@ -52,6 +65,7 @@ export class TextSettings extends TileCollectionFormatSettings.TextSettings {
   }
 }
 
+
 export class IconSettings extends TileCollectionFormatSettings.IconSettings {
   state: State = State.unselected
   statesUsed: StatesUsed = {
@@ -62,15 +76,9 @@ export class IconSettings extends TileCollectionFormatSettings.IconSettings {
   }
 }
 
-export class LayoutSettings extends TileCollectionFormatSettings.LayoutSettings {
-  state: State = State.unselected
-  statesUsed: StatesUsed = {
-    selected: false,
-    unselected: true,
-    hover: false,
-    disabled: false
-  }
+export class ShapeSettings extends TileCollectionFormatSettings.ShapeSettings{
 }
+
 
 export class ContentAlignmentSettings extends TileCollectionFormatSettings.ContentAlignmentSettings{
   state: State = State.unselected
@@ -97,18 +105,13 @@ export class ContentSettings {
   public icon: string = ""
 }
 
-export class BgImgSettings{
-  public show: boolean = false
-  public img: string = ""
-}
-
 export class VisualSettings extends DataViewObjectsParser {
-  public tile: TileSettings = new TileSettings();
+  public tileFill: TileFillSettings = new TileFillSettings();
+  public tileStroke: TileStrokeSettings = new TileStrokeSettings();
   public text: TextSettings = new TextSettings();
   public icon: IconSettings = new IconSettings();
-  public layout: LayoutSettings = new LayoutSettings();
+  public shape: ShapeSettings = new ShapeSettings();
+  public content: ContentSettings = new ContentSettings();
   public contentAlignment: ContentAlignmentSettings = new ContentAlignmentSettings();
   public effect: EffectSettings = new EffectSettings();
-  public bgimg: BgImgSettings = new BgImgSettings();
-  public content: ContentSettings = new ContentSettings();
 }

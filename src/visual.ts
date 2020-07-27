@@ -43,28 +43,16 @@ import { VisualSettings } from "./settings";
 import VisualObjectInstanceEnumeration = powerbi.VisualObjectInstanceEnumeration;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils"
-
 import * as d3 from "d3";
-// import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { PropertyGroupKeys } from './TilesCollection/interfaces'
-import { getCorrectPropertyStateName } from './TilesCollection/functions'
 import { getPropertyStateNameArr, getObjectsToPersist } from './TilesCollectionUtlities/functions'
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
-// import * as enums from "./enums"
-import {TileSizingType, TileLayoutType, TileShape, IconPlacement, State} from './TilesCollection/enums'
-import {ContentSource} from './enums'
-
-import { select, merge } from "d3";
-
-
 import {ShapeCollection, ShapeData} from './ShapeCollection'
-import { ContentFormatType } from "./TilesCollection/enums";
+import { State } from "./TilesCollection/enums";
 
 export class Visual implements IVisual {
-    private target: HTMLElement;
     public host: IVisualHost;
 
     private visualSettings: VisualSettings;
@@ -102,7 +90,7 @@ export class Visual implements IVisual {
             let state: State = propertyGroup["state"]
             for (let i = 0; i < groupedKeyNamesArr.length; i++) {
                 let groupedKeyNames = groupedKeyNamesArr[i]
-                if (prefix && !groupedKeyNames.default.startsWith(prefix))
+                if (prefix && (!groupedKeyNames.default || !groupedKeyNames.default.startsWith(prefix)))
                     continue
                 switch (state) {
                     case State.all:
@@ -136,8 +124,20 @@ export class Visual implements IVisual {
 
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
         switch (objectName) {
-            case "tile":
-                properties = {...properties, ...this.getEnumeratedStateProperties(settings.tile) }
+            case "tileFill":
+                properties.state = settings.tileFill.state
+                properties.hoverStyling = settings.tileFill.hoverStyling
+                properties = { ...properties, ...this.getEnumeratedStateProperties(settings.tileFill) }
+
+                properties.showBgimg = settings.tileFill.showBgimg
+                if(properties.showBgimg){
+                    properties.img = settings.tileFill.img
+                }
+                break
+            case "tileStroke":
+                properties.state = settings.tileStroke.state
+                properties.hoverStyling = settings.tileStroke.hoverStyling
+                properties = { ...properties, ...this.getEnumeratedStateProperties(settings.tileStroke) }
                 break
             case "text": {
                 properties.show = settings.text.show
@@ -162,21 +162,16 @@ export class Visual implements IVisual {
                 properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
                 break
             }
-            case "layout": {
-                let excludeWhenNotFixed = ["tileWidth", "tileHeight", "tileAlignment"]
-
-                let filtered = Object.keys(settings.layout)
+            case "shape": {
+                let filtered = Object.keys(settings.shape)
                     .filter(key => !(key.endsWith("Angle") || key.endsWith("Length"))
-                        || key == settings.layout.tileShape + "Angle"
-                        || key == settings.layout.tileShape + "Length")
-                    .filter(key => !(settings.layout.sizingMethod != TileSizingType.fixed && excludeWhenNotFixed.indexOf(key) > -1))
+                        || key == settings.shape.tileShape + "Angle"
+                        || key == settings.shape.tileShape + "Length")
                     .reduce((obj, key) => {
-                        obj[key] = settings.layout[key]
-                        return obj;
-                    }, {})
-
-                properties = { ...properties, ...filtered }
-                break
+                            obj[key] = settings.shape[key]
+                            return obj;
+                        }, {})
+                properties = {...properties, ...filtered}
             }
             case "contentAlignment": {
                 let filtered = Object.keys(settings.contentAlignment)
@@ -187,10 +182,15 @@ export class Visual implements IVisual {
                 properties = { ...properties, ...this.getEnumeratedStateProperties(filtered) }
                 break
             }
-            case "effect":
+            case "effect":{
                 properties.shapeRoundedCornerRadius = settings.effect.shapeRoundedCornerRadius
                 properties.state = settings.effect.state
                 properties.hoverStyling = settings.effect.hoverStyling
+                properties.gradient = settings.effect.gradient
+                if (settings.effect.gradient){
+                    properties.reverseGradient = settings.effect.reverseGradient
+                    properties = { ...properties, ...this.getEnumeratedStateProperties(settings.effect, "gradient") }
+                }
                 properties.shadow = settings.effect.shadow
                 if (settings.effect.shadow)
                     properties = { ...properties, ...this.getEnumeratedStateProperties(settings.effect, "shadow") }
@@ -198,22 +198,17 @@ export class Visual implements IVisual {
                 if (settings.effect.glow)
                     properties = { ...properties, ...this.getEnumeratedStateProperties(settings.effect, "glow") }
                 break
+            }
             case "content":
                 properties.text = settings.content.text
                 properties.icon = settings.content.icon
                 break
-            case "bgimg":
-                properties.show = settings.bgimg.show
-                properties.img = settings.bgimg.img
-                break
         }
-
         objectEnumeration.push({
             objectName: objectName,
             properties: properties,
             selector: null
         })
-
         return objectEnumeration
     }
 
@@ -227,12 +222,13 @@ export class Visual implements IVisual {
             this.host.persistProperties(objects);
 
 
-        this.shapeCollection.formatSettings.tile = this.visualSettings.tile
-        this.shapeCollection.formatSettings.text = this.visualSettings.text
-        this.shapeCollection.formatSettings.icon = this.visualSettings.icon
-        this.shapeCollection.formatSettings.layout = this.visualSettings.layout
-        this.shapeCollection.formatSettings.contentAlignment = this.visualSettings.contentAlignment
-        this.shapeCollection.formatSettings.effect = this.visualSettings.effect
+            this.shapeCollection.formatSettings.tileStroke = this.visualSettings.tileStroke
+            this.shapeCollection.formatSettings.tileFill = this.visualSettings.tileFill
+            this.shapeCollection.formatSettings.text = this.visualSettings.text
+            this.shapeCollection.formatSettings.icon = this.visualSettings.icon
+            this.shapeCollection.formatSettings.shape = this.visualSettings.shape
+            this.shapeCollection.formatSettings.contentAlignment = this.visualSettings.contentAlignment
+            this.shapeCollection.formatSettings.effect = this.visualSettings.effect
 
         this.shapeCollection.viewport = {
             height: options.viewport.height,
@@ -248,18 +244,10 @@ export class Visual implements IVisual {
         }
 
         public createShapeData(): ShapeData[] {
-            let contentFormatType = ContentFormatType.empty
-            if (this.visualSettings.text.show && !this.visualSettings.icon.show)
-                contentFormatType = ContentFormatType.text
-            if (!this.visualSettings.text.show && this.visualSettings.icon.show)
-                contentFormatType = ContentFormatType.icon
-            if (this.visualSettings.text.show && this.visualSettings.icon.show)
-                contentFormatType = ContentFormatType.text_icon
             let shapeData: ShapeData[] =  [{
-                text: this.visualSettings.content.text,
-                iconURL: this.visualSettings.content.icon ||  "", 
-                bgimgURL: this.visualSettings.bgimg.show ? this.visualSettings.bgimg.img : "",
-                contentFormatType: contentFormatType,
+                text: this.visualSettings.text.show ? this.visualSettings.content.text : null,
+                iconURL: this.visualSettings.icon.show ? this.visualSettings.content.icon :  null, 
+                bgimgURL: this.visualSettings.tileFill.showBgimg ? this.visualSettings.tileFill.img : null,
             }];
             return shapeData
         }
